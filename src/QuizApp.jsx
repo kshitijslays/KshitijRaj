@@ -45,7 +45,8 @@ const questions = [
     { question: "Which lifecycle method runs after a component mounts?", options: ["componentDidMount", "componentWillMount", "render", "componentDidUpdate"], answer: "componentDidMount" },
     { question: "Which keyword is used to create a functional component in React?", options: ["function", "class", "component", "define"], answer: "function" },
     { question: "What does `npm start` do in a React project?", options: ["Runs the development server", "Builds the project", "Installs dependencies", "Deploys the app"], answer: "Runs the development server" },
-    { question: "Which hook is used to get a reference to a DOM element in React?", options: ["useRef", "useState", "useEffect", "useMemo"], answer: "useRef" }
+    { question: "Which hook is used to get a reference to a DOM element in React?", options: ["useRef", "useState", "useEffect", "useMemo"], answer: "useRef" },
+    { question: "Which hook is used to perform side effects in React?", options: ["useEffect", "useState", "useContext", "useReducer"], answer: "useEffect" }
   ];
   
 
