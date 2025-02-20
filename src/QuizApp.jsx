@@ -1,54 +1,60 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle, XCircle, Clock, Award } from "lucide-react";
 
+// Format time helper function
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
 const questions = [ 
-    // HTML Questions
-    { question: "What does HTML stand for?", options: ["Hyper Text Markup Language", "High Tech Modern Language", "Hyperlink and Text Markup Language", "Home Tool Markup Language"], answer: "Hyper Text Markup Language" },
-    { question: "Which HTML tag is used to define an internal stylesheet?", options: ["<style>", "<script>", "<css>", "<link>"], answer: "<style>" },
-    { question: "What is the purpose of the `<head>` tag in HTML?", options: ["Defines the main content", "Contains metadata and links", "Creates a heading", "Displays images"], answer: "Contains metadata and links" },
-    { question: "Which tag is used for creating a hyperlink?", options: ["<link>", "<a>", "<href>", "<nav>"], answer: "<a>" },
-    { question: "Which attribute is used to open a link in a new tab?", options: ["target='_blank'", "new_tab='true'", "open='new'", "window='new'"], answer: "target='_blank'" },
-    { question: "What is the correct way to insert an image in HTML?", options: ["<img src='image.jpg'>", "<image>image.jpg</image>", "<img>image.jpg</img>", "<pic src='image.jpg'>"], answer: "<img src='image.jpg'>" },
-    { question: "Which HTML tag is used to define a table?", options: ["<table>", "<tab>", "<tr>", "<td>"], answer: "<table>" },
-    { question: "Which tag is used to create an ordered list?", options: ["<ol>", "<ul>", "<li>", "<list>"], answer: "<ol>" },
-    { question: "Which HTML tag is used for a line break?", options: ["<br>", "<lb>", "<break>", "<line>"], answer: "<br>" },
-    { question: "What does the `<meta>` tag do in HTML?", options: ["Defines metadata about a webpage", "Creates a form", "Adds images", "Styles the page"], answer: "Defines metadata about a webpage" },
-  
-    // CSS Questions
-    { question: "What property is used to change the text color in CSS?", options: ["color", "background-color", "text-color", "font-color"], answer: "color" },
-    { question: "Which CSS property is used to make text bold?", options: ["font-weight", "text-style", "bold", "font-bold"], answer: "font-weight" },
-    { question: "Which CSS property is used to set background color?", options: ["background-color", "color", "bgcolor", "background"], answer: "background-color" },
-    { question: "Which CSS property is used to control the spacing between elements?", options: ["margin", "padding", "border", "spacing"], answer: "margin" },
-    { question: "Which CSS unit is relative to the font size of the element?", options: ["px", "em", "cm", "%"], answer: "em" },
-    { question: "What is the default position of an HTML element?", options: ["relative", "absolute", "static", "fixed"], answer: "static" },
-    { question: "Which CSS property is used to make an element transparent?", options: ["visibility", "opacity", "display", "transparent"], answer: "opacity" },
-    { question: "Which CSS property is used for creating rounded corners?", options: ["border", "border-radius", "corner", "rounding"], answer: "border-radius" },
-    { question: "Which pseudo-class selects the first child of an element?", options: [":first-child", ":last-child", ":nth-child(1)", ":first"], answer: ":first-child" },
-    { question: "Which CSS property is used to align text?", options: ["text-align", "align", "justify", "position"], answer: "text-align" },
-  
-    // React Questions
-    { question: "What is JSX in React?", options: ["A JavaScript extension", "A CSS framework", "A package manager", "A database query language"], answer: "A JavaScript extension" },
-    { question: "Which React hook is used for managing state?", options: ["useEffect", "useState", "useContext", "useReducer"], answer: "useState" },
-    { question: "Which method is used to render components in React?", options: ["ReactDOM.render()", "React.render()", "renderComponent()", "createComponent()"], answer: "ReactDOM.render()" },
-    { question: "How do you pass data from a parent component to a child component in React?", options: ["Using props", "Using state", "Using Redux", "Using context"], answer: "Using props" },
-    { question: "Which React hook is used for side effects?", options: ["useEffect", "useState", "useRef", "useContext"], answer: "useEffect" },
-    { question: "What is the main purpose of React?", options: ["To manage databases", "To build UI components", "To create servers", "To handle CSS"], answer: "To build UI components" },
-    { question: "Which file is the entry point of a React application?", options: ["index.js", "App.js", "main.js", "server.js"], answer: "index.js" },
-    { question: "What does the useState hook return?", options: ["A state variable and a function to update it", "A single state variable", "A function to update state", "A new React component"], answer: "A state variable and a function to update it" },
-    { question: "Which function is used to create a new React component?", options: ["function Component()", "new Component()", "createComponent()", "class Component"], answer: "function Component()" },
-    { question: "Which command is used to create a new React app?", options: ["npx create-react-app my-app", "npm install react", "react init my-app", "create-react-app my-app"], answer: "npx create-react-app my-app" },
-    { question: "How do you handle forms in React?", options: ["Using state", "Using Redux", "Using jQuery", "Using HTML forms"], answer: "Using state" },
-    { question: "What is the virtual DOM in React?", options: ["A lightweight copy of the actual DOM", "A different programming language", "A cloud database", "A styling method"], answer: "A lightweight copy of the actual DOM" },
-    { question: "Which React hook is used for managing global state?", options: ["useContext", "useState", "useEffect", "useReducer"], answer: "useContext" },
-    { question: "What is React Router used for?", options: ["Handling navigation", "Managing global state", "Styling components", "Fetching APIs"], answer: "Handling navigation" },
-    { question: "How can you apply CSS styles in a React component?", options: ["Inline styles, CSS files, or styled-components", "Only inline styles", "Only CSS files", "Only styled-components"], answer: "Inline styles, CSS files, or styled-components" },
-    { question: "Which lifecycle method runs after a component mounts?", options: ["componentDidMount", "componentWillMount", "render", "componentDidUpdate"], answer: "componentDidMount" },
-    { question: "Which keyword is used to create a functional component in React?", options: ["function", "class", "component", "define"], answer: "function" },
-    { question: "What does `npm start` do in a React project?", options: ["Runs the development server", "Builds the project", "Installs dependencies", "Deploys the app"], answer: "Runs the development server" },
-    { question: "Which hook is used to get a reference to a DOM element in React?", options: ["useRef", "useState", "useEffect", "useMemo"], answer: "useRef" },
-    { question: "Which hook is used to perform side effects in React?", options: ["useEffect", "useState", "useContext", "useReducer"], answer: "useEffect" }
-  ];
-  
+  // HTML Questions
+  { question: "What does HTML stand for?", options: ["Hyper Text Markup Language", "High Tech Modern Language", "Hyperlink and Text Markup Language", "Home Tool Markup Language"], answer: "Hyper Text Markup Language" },
+  { question: "Which HTML tag is used to define an internal stylesheet?", options: ["<style>", "<script>", "<css>", "<link>"], answer: "<style>" },
+  { question: "What is the purpose of the <head> tag in HTML?", options: ["Defines the main content", "Contains metadata and links", "Creates a heading", "Displays images"], answer: "Contains metadata and links" },
+  { question: "Which tag is used for creating a hyperlink?", options: ["<link>", "<a>", "<href>", "<nav>"], answer: "<a>" },
+  { question: "Which attribute is used to open a link in a new tab?", options: ["target='_blank'", "new_tab='true'", "open='new'", "window='new'"], answer: "target='_blank'" },
+  { question: "What is the correct way to insert an image in HTML?", options: ["<img src='image.jpg'>", "<image>image.jpg</image>", "<img>image.jpg</img>", "<pic src='image.jpg'>"], answer: "<img src='image.jpg'>" },
+  { question: "Which HTML tag is used to define a table?", options: ["<table>", "<tab>", "<tr>", "<td>"], answer: "<table>" },
+  { question: "Which tag is used to create an ordered list?", options: ["<ol>", "<ul>", "<li>", "<list>"], answer: "<ol>" },
+  { question: "Which HTML tag is used for a line break?", options: ["<br>", "<lb>", "<break>", "<line>"], answer: "<br>" },
+  { question: "What does the <meta> tag do in HTML?", options: ["Defines metadata about a webpage", "Creates a form", "Adds images", "Styles the page"], answer: "Defines metadata about a webpage" },
+
+  // CSS Questions
+  { question: "What property is used to change the text color in CSS?", options: ["color", "background-color", "text-color", "font-color"], answer: "color" },
+  { question: "Which CSS property is used to make text bold?", options: ["font-weight", "text-style", "bold", "font-bold"], answer: "font-weight" },
+  { question: "Which CSS property is used to set background color?", options: ["background-color", "color", "bgcolor", "background"], answer: "background-color" },
+  { question: "Which CSS property is used to control the spacing between elements?", options: ["margin", "padding", "border", "spacing"], answer: "margin" },
+  { question: "Which CSS unit is relative to the font size of the element?", options: ["px", "em", "cm", "%"], answer: "em" },
+  { question: "What is the default position of an HTML element?", options: ["relative", "absolute", "static", "fixed"], answer: "static" },
+  { question: "Which CSS property is used to make an element transparent?", options: ["visibility", "opacity", "display", "transparent"], answer: "opacity" },
+  { question: "Which CSS property is used for creating rounded corners?", options: ["border", "border-radius", "corner", "rounding"], answer: "border-radius" },
+  { question: "Which pseudo-class selects the first child of an element?", options: [":first-child", ":last-child", ":nth-child(1)", ":first"], answer: ":first-child" },
+  { question: "Which CSS property is used to align text?", options: ["text-align", "align", "justify", "position"], answer: "text-align" },
+
+  // React Questions
+  { question: "What is JSX in React?", options: ["A JavaScript extension", "A CSS framework", "A package manager", "A database query language"], answer: "A JavaScript extension" },
+  { question: "Which React hook is used for managing state?", options: ["useEffect", "useState", "useContext", "useReducer"], answer: "useState" },
+  { question: "Which method is used to render components in React?", options: ["ReactDOM.render()", "React.render()", "renderComponent()", "createComponent()"], answer: "ReactDOM.render()" },
+  { question: "How do you pass data from a parent component to a child component in React?", options: ["Using props", "Using state", "Using Redux", "Using context"], answer: "Using props" },
+  { question: "Which React hook is used for side effects?", options: ["useEffect", "useState", "useRef", "useContext"], answer: "useEffect" },
+  { question: "What is the main purpose of React?", options: ["To manage databases", "To build UI components", "To create servers", "To handle CSS"], answer: "To build UI components" },
+  { question: "Which file is the entry point of a React application?", options: ["index.js", "App.js", "main.js", "server.js"], answer: "index.js" },
+  { question: "What does the useState hook return?", options: ["A state variable and a function to update it", "A single state variable", "A function to update state", "A new React component"], answer: "A state variable and a function to update it" },
+  { question: "Which function is used to create a new React component?", options: ["function Component()", "new Component()", "createComponent()", "class Component"], answer: "function Component()" },
+  { question: "Which command is used to create a new React app?", options: ["npx create-react-app my-app", "npm install react", "react init my-app", "create-react-app my-app"], answer: "npx create-react-app my-app" },
+  { question: "How do you handle forms in React?", options: ["Using state", "Using Redux", "Using jQuery", "Using HTML forms"], answer: "Using state" },
+  { question: "What is the virtual DOM in React?", options: ["A lightweight copy of the actual DOM", "A different programming language", "A cloud database", "A styling method"], answer: "A lightweight copy of the actual DOM" },
+  { question: "Which React hook is used for managing global state?", options: ["useContext", "useState", "useEffect", "useReducer"], answer: "useContext" },
+  { question: "What is React Router used for?", options: ["Handling navigation", "Managing global state", "Styling components", "Fetching APIs"], answer: "Handling navigation" },
+  { question: "How can you apply CSS styles in a React component?", options: ["Inline styles, CSS files, or styled-components", "Only inline styles", "Only CSS files", "Only styled-components"], answer: "Inline styles, CSS files, or styled-components" },
+  { question: "Which lifecycle method runs after a component mounts?", options: ["componentDidMount", "componentWillMount", "render", "componentDidUpdate"], answer: "componentDidMount" },
+  { question: "Which keyword is used to create a functional component in React?", options: ["function", "class", "component", "define"], answer: "function" },
+  { question: "What does npm start do in a React project?", options: ["Runs the development server", "Builds the project", "Installs dependencies", "Deploys the app"], answer: "Runs the development server" },
+  { question: "Which hook is used to get a reference to a DOM element in React?", options: ["useRef", "useState", "useEffect", "useMemo"], answer: "useRef" },
+  { question: "Which hook is used to perform side effects in React?", options: ["useEffect", "useState", "useContext", "useReducer"], answer: "useEffect" }
+];
 
 const QuizApp = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -61,6 +67,7 @@ const QuizApp = () => {
   const [score, setScore] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
 
+  // Quiz timer effect
   useEffect(() => {
     const quizInterval = setInterval(() => {
       setQuizTimer((prev) => {
@@ -75,19 +82,26 @@ const QuizApp = () => {
     return () => clearInterval(quizInterval);
   }, []);
 
+  // Question timer effect
   useEffect(() => {
+    if (showResult) return;
+
     const questionInterval = setInterval(() => {
-      if (!showResult && questionTimer > 0) {
-        setQuestionTimer((prev) => prev - 1);
-      } else if (!showResult && questionTimer === 0) {
-        handleNextQuestion();
-      }
+      setQuestionTimer((prev) => {
+        if (prev <= 1) {
+          handleNextQuestion();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
     return () => clearInterval(questionInterval);
-  }, [questionTimer, showResult]);
+  }, [showResult, currentQuestion]);
 
   const handleOptionSelect = (option) => {
+    if (showResult) return;
+    
     setSelectedOption(option);
     const correct = option === questions[currentQuestion].answer;
     setIsCorrect(correct);
@@ -114,15 +128,10 @@ const QuizApp = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion((prev) => prev - 1);
       setSelectedOption(answers[currentQuestion - 1]);
-      setShowResult(false);
+      setShowResult(true);
       setQuestionTimer(0);
+      setIsCorrect(answers[currentQuestion - 1] === questions[currentQuestion - 1].answer);
     }
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (showSummary) {
@@ -153,7 +162,6 @@ const QuizApp = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Progress and Timer Bar */}
         <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 mb-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-white">Progress: {currentQuestion + 1}/{questions.length}</span>
@@ -170,7 +178,6 @@ const QuizApp = () => {
           </div>
         </div>
 
-        {/* Question Card */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-4">
           {!showResult ? (
             <>
@@ -182,12 +189,12 @@ const QuizApp = () => {
                   <button
                     key={index}
                     onClick={() => handleOptionSelect(option)}
-                    disabled={questionTimer === 0}
+                    disabled={showResult}
                     className={`w-full p-4 rounded-xl text-left transition-all duration-200 
                       ${selectedOption === option 
                         ? 'bg-purple-500 text-white' 
                         : 'bg-white/5 hover:bg-white/20 text-white'}
-                      ${questionTimer === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-102'}
+                      ${showResult ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/20'}
                     `}
                   >
                     {option}
@@ -220,7 +227,6 @@ const QuizApp = () => {
           )}
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-between gap-4">
           <button
             onClick={handlePreviousQuestion}
@@ -235,9 +241,9 @@ const QuizApp = () => {
           </button>
           <button
             onClick={handleNextQuestion}
-            disabled={currentQuestion === questions.length - 1 && !showResult}
+            disabled={!showResult && currentQuestion === questions.length - 1}
             className={`px-6 py-3 rounded-xl backdrop-blur-lg transition-all duration-200
-              ${currentQuestion === questions.length - 1 && !showResult
+              ${!showResult && currentQuestion === questions.length - 1
                 ? 'bg-white/10 cursor-not-allowed opacity-50' 
                 : 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white'}
             `}
